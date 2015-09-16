@@ -47,8 +47,8 @@ impl error::Error for Error {
     }
 }
 
-// NOTE: `R` should be `?Sized` but theres a compiler bug that prevents it right now.
-pub struct BitReader<R: Read, E: Endianess> {
+/// `BitReader` reads an input stream as a stream of bits (instead of the normal byte-level).
+pub struct BitReader<R: Read + ?Sized, E: Endianess> {
     _ph: PhantomData<*const E>,
     consumed_bits: usize,
     buf_size: u32,
@@ -57,6 +57,7 @@ pub struct BitReader<R: Read, E: Endianess> {
     inner: R,
 }
 
+/// A trait for handling endian-specific operations
 pub trait Endianess {
     fn swap(s: usize) -> usize;
     fn get_bits(v: usize, start: usize, len: usize) -> usize;
@@ -144,10 +145,11 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
             }
         }
     }
-
 }
 
-impl<R: Read, E:Endianess> BitReader<R, E> {
+impl<R: Read + ?Sized, E:Endianess> BitReader<R, E> {
+    /// Reads `bits` bits into a `usize`.
+    /// Panics if `bits` is greater than the number of bits in a `usize`
     pub fn read_usize(&mut self, bits: u8) -> Result<usize> {
         if bits == 0 { return Ok(0); }
         let bits = bits as usize;
@@ -179,6 +181,8 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
         }
     }
 
+    /// Reads `bits` bits into an `isize`.
+    /// Panics if `bits` is greater than the number of bits in a `isize`
     pub fn read_isize(&mut self, bits: u8) -> Result<isize> {
         if bits == 0 { return Ok(0); }
         let v = try!(self.read_usize(bits));
@@ -193,18 +197,23 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
         }
     }
 
+    /// Reads `bits` bits into a `u64`.
+    /// Panics if `bits` is greater than the number of bits in a `u64`
     pub fn read_u64(&mut self, bits: u8) -> Result<u64> {
         assert!(bits <= 64);
         let bits = bits as usize;
         if bits <= word_bits() {
             Ok(try!(self.read_usize(bits as u8)) as u64)
         } else {
+            // Handle the case where size_of::<u64>() > size_of::<usize>
             let first = try!(self.read_usize(word_bits() as u8));
             let second = try!(self.read_usize((bits - word_bits()) as u8));
             Ok(E::combine_words(first, second))
         }
     }
 
+    /// Reads `bits` bits into an `i64`.
+    /// Panics if `bits` is greater than the number of bits in a `i64`
     pub fn read_i64(&mut self, bits: u8) -> Result<i64> {
         assert!(bits <= 64);
         let bits = bits as usize;
@@ -263,10 +272,13 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
             .map_err(|e| Error::from(e))
     }
 
+    /// Read a single bit from the stream returning it as a boolean value
     pub fn read_bit(&mut self) -> Result<bool> {
         Ok(try!(self.read_usize(1)) != 0)
     }
 
+    /// Read an unsigned, unary-coded value from the bitstream. This uses one-terminated encoding.
+    /// For example: the number `6` is encoded as `0000001`
     pub fn read_unary_unsigned(&mut self) -> Result<usize> {
         if false { // Simple version
             let mut val = 0;
@@ -324,6 +336,8 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
         }
     }
 
+    /// Advances the reader such that the next bits will be from the start of a byte boundary.  If
+    /// the reader is already on a byte boundary, nothing is changed.
     pub fn skip_to_byte(&mut self) {
         if (self.consumed_bits % 8) > 0 {
             self.consumed_bits += 8 - (self.consumed_bits % 8);
@@ -447,7 +461,7 @@ impl<R: Read, E:Endianess> BitReader<R, E> {
 
 }
 
-impl<R:Read, E:Endianess> Drop for BitReader<R,E> {
+impl<R:Read + ?Sized, E:Endianess> Drop for BitReader<R,E> {
     fn drop(&mut self) {
         unsafe {
             deallocate_buffer(self.buffer, self.buf_size as usize);

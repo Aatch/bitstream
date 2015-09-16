@@ -2,3 +2,8 @@
 name = "bitstream"
 version = "0.1.0"
 authors = ["James Miller <james@aatch.net>"]
+description = "Bit level IO"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["bitstream", "io"]
+repository = "https://github.com/Aatch/bitstream"
