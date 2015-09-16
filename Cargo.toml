@@ -7,3 +7,6 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = ["bitstream", "io"]
 repository = "https://github.com/Aatch/bitstream"
+
+[features]
+unstable = []
