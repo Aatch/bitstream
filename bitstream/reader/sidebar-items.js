@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BigEndian",""],["Error",""],["LittleEndian",""]],"struct":[["BitReader","`BitReader` reads an input stream as a stream of bits (instead of the normal byte-level)."]],"trait":[["Endianess","A trait for handling endian-specific operations"]],"type":[["Result",""]]});
