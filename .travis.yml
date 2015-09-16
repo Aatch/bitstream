@@ -1,22 +1,19 @@
 language: rust
-
 rust:
-  - nightly
+- nightly
 before_script:
-  - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
+- pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
 script:
-  - |
-      travis-cargo build -- --features "$FEATURES" &&
-      travis-cargo test -- --features "$FEATURES" &&
-      travis-cargo bench -- --features "$FEATURES" &&
-      travis-cargo doc -- --features "$FEATURES"
-
+- |
+  travis-cargo build -- --features "$FEATURES" &&
+  travis-cargo test -- --features "$FEATURES" &&
+  travis-cargo bench -- --features "$FEATURES" &&
+  travis-cargo doc -- --features "$FEATURES"
 after_success:
-  - if [ -z "$FEATURES" ]; then travis-cargo doc-upload; fi
-
+- if [ -z "$FEATURES" ]; then travis-cargo doc-upload; fi
 env:
   matrix:
-    - FEATURES=''
+  - FEATURES=''
   global:
   - TRAVIS_CARGO_NIGHTLY_FEATURE=unstable
-  - secure: dc4TpJx2YONax6C5967cUmTKH/54pwUtDQu/9+KdjxA75AE1KjibZcg1W5bJhfYaWMPCTT2cwTfvUZP8k2tC0erWQUJv9iWy6MsrDTx88WeHmUlHls4OF64pa0kfSN4+Np4+96WMfFH2nlVGFazXzNeP2Dzwhyh54jW+qEfpICT5PSZm4cuLbhIzMviNu1fwFzQHDlsGnrhhc/rP9riYHIVYF9rCMMAugufKoDYdp4wllowhvVt+2OZlY2i7G0cPr3OZq5DvdQ07JWpGGKBMqSK5dLGTirfBSgTOv28CaCDwKUkTz1JCU3205NjbAnvGFkiym4opjRJpyLBIeRjxGULkodbBsUdg6F5JZTsmyaBaxszzk/l4TFaZ6TaKb2hU1G4EYa1lsPe5NEwOHY2YgGf+eCy/0kA4QpumUktY7844Vn409wJvZ5lmoiWhm6ZZpbu27KnZEBZGdWjfYIUdB3rm07BZcS8CcjYREzO+7rRPNwk3wg6DFFxRCugKMADLBBtndBxqenO12FuFiOkD5kyoufqSioO0quU6kAe5BtU+7+n7+mkzvhq7BowKXadKozNFVyo1rmGnO54z9TLgrwybRmx7pRXKJiYuOxL8T7UUPQUvQE2AYSF9462SdgDmpH+Um7Mojc9jb/qlEqBzHxze4X8Gz+25AcWvbgTVsQU=
+  - secure: tGxXnSWSs7UCvga7/gEG3nK7Z2GXJeCgStPcmEs59i/yC1vQb26Wk79+GswNdsqCKfWy7VxQU2kNLXif2Cnvw01qbQcJZ+QMhwviEyM/R8v+RuQfvPjf0NOFW7qBi4B99CaXWWzTbCKIPq/zBrSghA78YpSJ4xcqm//y7SbjR/gjzp/35/4DspsxQFeAjYHG3oFprNM3pt5KLNBfSmmX0Ebau1jx/qps52SE2DbZE2vcIdcNoHw/TLRmvFNeqFYS1iM+KRHGag9oxuFENWRR6qw86yRkToTuocVqwxzXLqqpoYiuFOq07COx+Ztr9gbjZpnYSQ04flIlJwFvUBQF+lvcG5XhXYCPmeYceiM+QpExBb9ttS6FBq3mymipGxa2Dwu7yjQNh183xxzRDQ0MRr8y3sWw9i1+4JL4LoLnQlKLkSqH/UBP3JcibZyEI3rqsxCtsFZ6kMzQ4r/IlY26cVeLHsj2KHfBHETBkAtLLiv3GtIIblz6XXMyW+Y6cQX8JTUXqzMP1NdECV++LnGJEPPB5RXzZVf98CHteR9+yNffdeSpDlujzl1bMGFBQV1hWXg/npw+KD03o3J9z21r+ejdZsWAYlqiHoFR0VjwRh/PMTjwm6HI71/ndWwqNs0d6RCGIQerwTdJ/1b5paXMUO/rAEL9bv87Upx96HvLTm0=
